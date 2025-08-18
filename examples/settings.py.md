@@ -67,7 +67,7 @@ DATABASES = {"foo": {"NAME": "mydb", ...}}
 #### {key}.OPTIONS
 > Arbitrary options passed directly to the DBMS driver as a key:value pair.
 
-As you can see you can use the `PARENT.KEY` spec optionally.
+As you can see you can use the `PARENT.KEY` or `PARENT__KEY` spec optionally.
 
 ##### TLS_VERIFICATION
 > Enables or disables TLS verification
