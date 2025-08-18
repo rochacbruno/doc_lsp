@@ -70,8 +70,8 @@ If the `settings.py.md` does not exist, then the action will be NOOP and just em
 
 ## Implementation
 
-- The doc_lsp is implemented in Rust
-- It is a single binary and zero config
+- The doc_lsp is implemented in Python
+- It is designed to run from `iv`
 - Just run `doc_lsp` to start calling it
 - Lookup is always read direclty from file, so changes on .md imediatelly reflect
 
