@@ -46,7 +46,7 @@ Then the LSP will lookup information about each variable on a separate file.
 
 ## Usage
 
-With the LSP Server `conf_doc_lsp` enabled on your editor,
+With the LSP Server `doc_lsp` enabled on your editor,
 having the variable selected or with cursor focus, trigger the action `view_doc` 
 and the editor will show the overlay with the full text from the respective comment file.
 
