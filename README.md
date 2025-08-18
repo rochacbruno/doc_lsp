@@ -25,7 +25,9 @@ Then the LSP will lookup information about each variable on a separate file.
 `settings.py.md`
 ```markdown
 ## SERVER
-> Server hostname used to connect to server
+> This variable defines which server the system is connected to,         
+> when used together with port this will define the connection string.   
+> example: `hostname:port`                                             
 
 ## PORT
 > Port used to connect ot server
