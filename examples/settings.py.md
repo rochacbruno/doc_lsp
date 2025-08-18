@@ -3,7 +3,7 @@
 This is the configuration documentation for the **APP**,
 Here you can get detailed information about how to configure the application.  
 
-The documentation written here is also available on the code editor via `doc_lsp`
+The documentation written here is also available on the code editor via `doc-lsp`
 
 ## SERVER
 > This variable defines which server the system is connected to,         
@@ -17,7 +17,7 @@ but the code editor will see only what is on the first blockquote above.
 > Port used to connect to server
 
 This can optionally have the default value added to the header.
-just for displaying reasons, doc_lsp will actually strip everything after the `=`
+just for displaying reasons, doc-lsp will actually strip everything after the `=`
 
 ## DEBUG = True
 > Enable or disable debugging mode
@@ -38,7 +38,7 @@ Example:
 DATABASES = {
   "default": {
     "NAME": "foo",
-    "OPTIONS: {
+    "OPTIONS": {
         "TLS_VERIFICATION": True,
         "TIMEOUT": 30
     }
@@ -78,6 +78,6 @@ so explicitly using the FQKP (Full qualified key path) is optional.
 ##### {key}.OPTIONS.TIMEOUT = 30
 > Time out in seconds
 
-<!-- doc_end -->
+<!-- doc-end -->
 
-The part of the doc that is read by doc_lsp ended, here any markdown or text can be added, doc_lsp ignores it.
+The part of the doc that is read by doc-lsp ended, here any markdown or text can be added, doc-lsp ignores it.

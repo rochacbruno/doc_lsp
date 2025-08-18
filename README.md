@@ -1,6 +1,6 @@
-# doc_lsp
+# doc-lsp
 
-doc_lsp is a simple specification and LSP (Language Server) that loads comments from a separate file.
+doc-lsp is a simple specification and LSP (Language Server) that loads comments from a separate file.
 
 Document variables in a separate markdown file and this LSP will show the docs on your editor.
 
@@ -46,7 +46,7 @@ Then the LSP will lookup information about each variable on a separate file.
 
 ## Usage
 
-With the LSP Server `doc_lsp` enabled on your editor,
+With the LSP Server `doc-lsp` enabled on your editor,
 having the variable selected or with cursor focus, trigger the action `view_doc` 
 and the editor will show the overlay with the full text from the respective comment file.
 
@@ -58,28 +58,28 @@ Trigger `view_doc` (you may have a keybind such as Ctrl+e`)
 
 ```plain
 SERV|ER = "foo"
-    ______ doc_lsp:SERVER ___________________________________________________
+    ______ doc-lsp:SERVER ___________________________________________________
     | This variable defines which server the system is connected to,         |
     | when used together with port this will define the connection string.   |
     | example: `hostname:port`                                               |
     _________________________________________________________________________
 ```
 
-If the `settings.py.md` does not exist, then the action will be NOOP and just emit a INFO `Doc not found for variable`
+If the `settings.py.md` does not exist, then the action will be NOOP and just emit a INFO `Doc not found for variable`.
 
 
 ## Implementation
 
-- The doc_lsp is implemented in Python
+- The doc-lsp is implemented in Python
 - It is designed to run from `iv`
-- Just run `doc_lsp` to start calling it
+- Just run `doc-lsp` to start calling it
 - Lookup is always read direclty from file, so changes on .md imediatelly reflect
 
 ## Specs
 
-- doc_lsp is filetype agnostic
-- doc_lsp lookup will match `filename.ext` -> `filename.ext.md`
-- Lookup is made from the doc_lsp parser
+- doc-lsp is filetype agnostic
+- doc-lsp lookup will match `filename.ext` -> `filename.ext.md`
+- Lookup is made from the doc-lsp parser
 - The last occurence wins in case of duplication
 
  

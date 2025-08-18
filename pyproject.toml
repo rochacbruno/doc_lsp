@@ -1,0 +1,24 @@
+[project]
+name = "doc-lsp"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Bruno Rocha", email = "rochacbruno@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "pygls",
+    "pyyaml>=6.0.2",
+    "rich>=14.1.0",
+]
+
+[project.scripts]
+doc-lsp = "doc_lsp:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv.sources]
+pygls = { git = "https://github.com/openlawlibrary/pygls" }

@@ -1,0 +1,16 @@
+[
+  {
+    "languageId": "custom",
+    "command": "doc-lsp",
+    "fileExtensions": [
+      ".py",
+      ".toml",
+      ".yaml",
+      ".yml",
+      ".ini",
+      ".conf",
+      ".properties",
+      ".json"
+    ]
+  }
+]

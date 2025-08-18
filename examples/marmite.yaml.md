@@ -2,7 +2,7 @@
 
 You can configure your Marmite blog using the `marmite.yaml` file,
 this document explains each variable and the documentation here is available
-on your code editor with `doc_lsp`.
+on your code editor with `doc-lsp`.
 
 Open the `marmite.yaml` on your editor and trigger the `view_doc` action on any variable.
 

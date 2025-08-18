@@ -12,9 +12,12 @@ DEFAULT_ORG = "Acme"
 DATABASES = {
   "default": {
     "NAME": "foo",
-    "OPTIONS: {
+    "OPTIONS": {
         "TLS_VERIFICATION": True,
         "TIMEOUT": 30
     }
   }
 }
+
+
+"2025-01-01"

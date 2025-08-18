@@ -1,35 +1,35 @@
 # App Config
 
-This is the general app config file, this headline (h1) here is ignored by `doc_lsp` but may be useful for publishing the docs on another markdown parser. e.g: Github, static site, docs site etc.
+This is the general app config file, this headline (h1) here is ignored by `doc-lsp` but may be useful for publishing the docs on another markdown parser. e.g: Github, static site, docs site etc.
 
-doc_lsp only cares about the heading levels starting from `##` that can be infinite number  
+doc-lsp only cares about the heading levels starting from `##` that can be infinite number  
 and the first blockquote after it in simple markdown like formatting such as **bold**, `monospace`, _italic_, ~~strike~~.
 
-All other content after the first blockquote is ignored by doc_slap, so any markdown formatting can be used.
+All other content after the first blockquote is ignored by doc-lsp, so any markdown formatting can be used.
 
-- doc_lsp will take variable name such as `FOO` and look for `## FOO` or `## Foo` or `## foo` case insensitive.
-- doc_lsp will also lookup for nesting variables, if triggered from `server: {ho|st: }` it will first lookup for
+- doc-lsp will take variable name such as `FOO` and look for `## FOO` or `## Foo` or `## foo` case insensitive.
+- doc-lsp will also lookup for nesting variables, if triggered from `server: {ho|st: }` it will first lookup for
 `## Server` and all its one level children, then will lookup for any of `### host`, `### server.host`, `### server__host` (it will actually take the heading, split for `.` then split for `__` and then take last element) the first that matches `host` will be the returnedvalue.
-- doc_lsp will read only the first blockquote inside that header, consecutive `>` or lines wrapped on `>>>` and `>>>`.
-- doc_lsp will ignore all the markdown after the first blockquote  
+- doc-lsp will read only the first blockquote inside that header, consecutive `>` or lines wrapped on `>>>` and `>>>`.
+- doc-lsp will ignore all the markdown after the first blockquote  
 
 
-doc_lsp built-in markdown parser is really simple, it only cares about
+doc-lsp built-in markdown parser is really simple, it only cares about
 
-- Find the doc_start/doc_end markers or set it as first `##` and `EOF`
+- Find the doc-start/doc-end markers or set it as first `##` and `EOF`
 - Capture all markdown headers with its contents (but it allows unlimited number of #)
 - Capture the first blockquote inside each header (consecutie `>` or `>>>` wrapped text)
 
-Adding `<!-- doc_start -->` will optionally tell doc_lsp where the documentation lookup must stop, so the lines before are ignored, if not found then it will assume the first `##` is the doc start.
+Adding `<!-- doc-start -->` will optionally tell doc-lsp where the documentation lookup must stop, so the lines before are ignored, if not found then it will assume the first `##` is the doc start.
 
-<!-- doc_start -->
+<!-- doc-start -->
 
 ## SERVER
 > This is the comment for the `SERVER` variable, the format here must keep simple to be effective  
 on the LSP overlay window. 
 > it can span multiple lines.
 
-This part is ignored by doc_lsp, the editor will show only the text above the line, so here you can have
+This part is ignored by doc-lsp, the editor will show only the text above the line, so here you can have
 any advanced markdown you want.
 
 ### SERVER.HOST
@@ -92,9 +92,9 @@ Dunder (double underscore) can also be used as a separator, useful for Dynaconf 
 
 ---
 
-<!-- doc_end -->
+<!-- doc-end -->
 
-Adding `<!-- doc_end -->` will optionally tell doc_lsp where the documentation lookup must stop, so the rest of markdown is ignored.
+Adding `<!-- doc-end -->` will optionally tell doc-lsp where the documentation lookup must stop, so the rest of markdown is ignored.
 
 ```mermaid
 graph LR
