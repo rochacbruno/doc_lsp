@@ -3,18 +3,17 @@
 This is the general app config file, this headline (h1) here is ignored by `doc-lsp` but may be useful for publishing the docs on another markdown parser. e.g: Github, static site, docs site etc.
 
 doc-lsp only cares about the heading levels starting from `##` that can be infinite number  
-and the first blockquote after it in simple markdown like formatting such as **bold**, `monospace`, _italic_, ~~strike~~.
+and the first blockquote after it.
 
 All other content after the first blockquote is ignored by doc-lsp, so any markdown formatting can be used.
 
 - doc-lsp will take variable name such as `FOO` and look for `## FOO` or `## Foo` or `## foo` case insensitive.
-- doc-lsp will also lookup for nesting variables, if triggered from `server: {ho|st: }` it will first lookup for
-`## Server` and all its one level children, then will lookup for any of `### host`, `### server.host`, `### server__host` (it will actually take the heading, split for `.` then split for `__` and then take last element) the first that matches `host` will be the returnedvalue.
-- doc-lsp will read only the first blockquote inside that header, consecutive `>` or lines wrapped on `>>>` and `>>>`.
+- doc-lsp will also lookup for nesting variables, if triggered from `server: {ho|st: }` it will first lookup for `## Server` and all its one level children, then will lookup for any of `### host`, `### server.host`, `### server__host` (it will actually take the heading, split for `.` then split for `__` and then take last element) the first that matches `host` will be the returnedvalue.
+- The nesting lookup will be made using AST for supported languages (Python, YAML, JSON, TOML) and for generic text files it will use a simple parser that will simply try to match the current line tokens with the variable name in the header, this will be done by tokenizing the line and then trying to match from full to partial by poping the last token until it matches, at the end it will match the first element that is the root of the variable name.
+- doc-lsp will read only the first blockquote inside that header, consecutive `>` or lines wrapped between `>>>` and `>>>`.
 - doc-lsp will ignore all the markdown after the first blockquote  
 
-
-doc-lsp built-in markdown parser is really simple, it only cares about
+doc-lsp built-in parser is really simple, it only cares about
 
 - Find the doc-start/doc-end markers or set it as first `##` and `EOF`
 - Capture all markdown headers with its contents (but it allows unlimited number of #)

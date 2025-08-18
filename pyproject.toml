@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "pydantic>=2.11.7",
     "pygls",
     "pyyaml>=6.0.2",
     "rich>=14.1.0",

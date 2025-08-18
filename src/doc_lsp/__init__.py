@@ -5,6 +5,7 @@ from lsprotocol import types
 
 from pygls.lsp.server import LanguageServer
 
+
 DATE_FORMATS = [
     "%H:%M:%S",
     "%d/%m/%y",
@@ -24,8 +25,17 @@ def hover(ls: LanguageServer, params: types.HoverParams):
     document_uri = params.text_document.uri
     document = ls.workspace.get_text_document(document_uri)
 
+    # Will have to detect document type and then parse the AST for the document
+    # using the parser.py module
+
+
     try:
         line = document.lines[pos.line]
+
+        server.window_log_message(types.LogMessageParams(
+        message=f"Line: {line}",
+        type=types.MessageType.Info,
+        ))
     except IndexError:
         return None
 
