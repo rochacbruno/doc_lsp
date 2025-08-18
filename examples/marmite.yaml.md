@@ -140,7 +140,7 @@ The `name` is the author's name, the `email` is the author's email, the `url` is
 ### [item].url
 > The URL of the author.
 
-### avatar
+### [item].avatar
 > The avatar of the author.
 
 ### authors[item].bio
