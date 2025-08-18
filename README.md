@@ -54,7 +54,7 @@ SERV|ER = "foo"
 ```
 Trigger `view_doc` (you may have a keybind such as Ctrl+e`)
 
-```py
+```plain
 SERV|ER = "foo"
     ______ doc_lsp:SERVER ___________________________________________________
     | This variable defines which server the system is connected to,         |
