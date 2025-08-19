@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from typing import Optional
 from urllib.parse import unquote, urlparse
@@ -7,6 +8,18 @@ from lsprotocol import types
 from pygls.lsp.server import LanguageServer
 
 from .parser import parse_document
+
+
+def uri_to_path(uri: str) -> Path:
+    """Convert a file URI to a Path object, handling Windows paths correctly."""
+    parsed = urlparse(uri)
+    path_str = unquote(parsed.path)
+    
+    # Handle Windows paths (remove leading slash if it's a Windows drive path)
+    if os.name == 'nt' and path_str.startswith('/') and len(path_str) > 2 and path_str[2] == ':':
+        path_str = path_str[1:]
+    
+    return Path(path_str)
 
 server = LanguageServer("doc-lsp", "v1")
 
@@ -61,9 +74,7 @@ def get_word_at_position(text: str, line: int, character: int) -> Optional[str]:
 
 def get_doc_file_path(file_uri: str) -> Optional[Path]:
     """Get the corresponding .md documentation file path."""
-    # Parse the file URI
-    parsed = urlparse(file_uri)
-    file_path = Path(unquote(parsed.path))
+    file_path = uri_to_path(file_uri)
 
     # Check if file extension is supported
     if file_path.suffix not in SUPPORTED_EXTENSIONS:
@@ -161,9 +172,7 @@ def did_change_watched_files(
 ):
     """Handle file change notifications to invalidate cache."""
     for change in params.changes:
-        # Parse the file URI
-        parsed = urlparse(change.uri)
-        file_path = Path(unquote(parsed.path))
+        file_path = uri_to_path(change.uri)
 
         # If it's a markdown file, invalidate its cache
         if file_path.suffix == ".md":

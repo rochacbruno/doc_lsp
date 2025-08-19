@@ -21,7 +21,11 @@ async def test_hover_on_settings(client: LanguageClient):
     test_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "examples", "settings.py")
     )
-    test_uri = "file://" + test_path
+    # Handle Windows paths correctly
+    if os.name == 'nt':  # Windows
+        test_uri = "file:///" + test_path.replace("\\", "/")
+    else:
+        test_uri = "file://" + test_path
     test_content = open(test_path).read()
 
     client.text_document_did_open(
@@ -82,7 +86,11 @@ async def test_hover_on_non_variable(client: LanguageClient):
     test_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "examples", "settings.py")
     )
-    test_uri = "file://" + test_path
+    # Handle Windows paths correctly
+    if os.name == 'nt':  # Windows
+        test_uri = "file:///" + test_path.replace("\\", "/")
+    else:
+        test_uri = "file://" + test_path
     test_content = open(test_path).read()
 
     client.text_document_did_open(
@@ -123,7 +131,11 @@ async def test_hover_on_yaml_file(client: LanguageClient):
     test_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "examples", "marmite.yaml")
     )
-    test_uri = "file://" + test_path
+    # Handle Windows paths correctly
+    if os.name == 'nt':  # Windows
+        test_uri = "file:///" + test_path.replace("\\", "/")
+    else:
+        test_uri = "file://" + test_path
 
     # Check if the YAML file exists
     if not os.path.exists(test_path):
