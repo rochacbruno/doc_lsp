@@ -152,6 +152,8 @@ Extra content that is ignored by the parser.
 
 """
 
+import re
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -172,7 +174,7 @@ class Variable(BaseModel):
     # required: taken from the presence of * on the header (NAME * = 10)
     # choices: taken from the [enum] on the header (NAME [option1, option2, option3] = option1)
     # deprecated: taken from the presence of `DEPRECATED` after name on the header (NAME DEPRECATED = 10)
-    parent: "Variable" | None = None
+    parent: Optional["Variable"] = None
     children: list["Variable"] = []
 
 
@@ -186,6 +188,22 @@ class Document(BaseModel):
         so it must be able to handle `SERVER.HOST` and `SERVER__HOST` and `SERVER__HOST__OPTIONS`
         the lookup_path can be a simple str to match or a specific AST path for instant lookup.
         """
+        # Try exact match first (case insensitive)
+        path_lower = path.lower()
+        for key, var in self.variables.items():
+            if key.lower() == path_lower:
+                return var
+
+        # Try matching just the variable name (last part)
+        parts = path.replace("__", ".").split(".")
+        target = parts[-1].lower()
+
+        for key, var in self.variables.items():
+            var_name = key.split(".")[-1].lower()
+            if var_name == target:
+                return var
+
+        return None
 
 
 class Header(BaseModel):
@@ -196,7 +214,7 @@ class Header(BaseModel):
     level: int
     title: str
     content: str
-    parent: "Header" | None = None
+    parent: Optional["Header"] = None
     children: list["Header"] = []
 
 
@@ -214,30 +232,134 @@ class HeaderTree(BaseModel):
 
 def parse_header_tree(markdown: str) -> HeaderTree:
     """Parse the markdown file and return the parsed markdown."""
+    lines = markdown.split("\n")
     headers = []
-    # TODO: Implement the parser
-    """
-    Read the markdown and split it into lines
-    Identify document start and end 
-    Identify level 1 headers (##) and their content 
-    For each level 1 header 
-      take the `title` from the header text 
-      take the `content` from the first blockquote imediately after it 
-      (blockquotes are wrapped between `>>>` and `>>>` or all consecutive `>` lines until the next line break)
-      take the `level` (taken from the `##` in the header, assuming `##` is the level 1)
-      take the `children` from recursively parsing the content of the header looking for next level headers (e.g: ###)
-      create a Header object with level, title and content, and the children
-      Add the header to the headers list
-    return the headers list
-    """
+    stack = []  # Stack to keep track of parent headers
+
+    # Find document start
+    doc_started = False
+    doc_start_idx = 0
+    doc_end_idx = len(lines)
+
+    for i, line in enumerate(lines):
+        if "<!-- doc-start -->" in line:
+            doc_started = True
+            doc_start_idx = i + 1
+            break
+        elif line.startswith("## "):
+            doc_started = True
+            doc_start_idx = i
+            break
+
+    if not doc_started:
+        return HeaderTree(headers=[])
+
+    # Find document end
+    for i, line in enumerate(lines[doc_start_idx:], doc_start_idx):
+        if "<!-- doc-end -->" in line:
+            doc_end_idx = i
+            break
+
+    i = doc_start_idx
+    while i < doc_end_idx:
+        line = lines[i]
+
+        # Check if it's a header
+        if re.match(r"^#{2,6} ", line):
+            # Count the level (## = level 1, ### = level 2, etc.)
+            level = len(re.match(r"^(#{2,6}) ", line).group(1)) - 1
+
+            # Extract title (remove # and everything after =)
+            title = re.sub(r"^#{2,6} ", "", line)
+            if "=" in title:
+                title = title.split("=")[0].strip()
+
+            # Extract content (blockquote immediately after)
+            content = ""
+            j = i + 1
+
+            # Skip empty lines
+            while j < doc_end_idx and not lines[j].strip():
+                j += 1
+
+            # Check for >>> style blockquote
+            if j < doc_end_idx and lines[j].strip() == ">>>":
+                j += 1
+                content_lines = []
+                while j < doc_end_idx and lines[j].strip() != ">>>":
+                    content_lines.append(lines[j])
+                    j += 1
+                content = "\n".join(content_lines).strip()
+                i = j
+            # Check for > style blockquote
+            elif j < doc_end_idx and lines[j].startswith(">"):
+                content_lines = []
+                while j < doc_end_idx and lines[j].startswith(">"):
+                    content_lines.append(lines[j][1:].strip())
+                    j += 1
+                content = "\n".join(content_lines)
+                i = j - 1
+
+            # Create header object
+            header = Header(level=level, title=title, content=content)
+
+            # Manage parent-child relationships based on level
+            while stack and stack[-1].level >= level:
+                stack.pop()
+
+            if stack:
+                header.parent = stack[-1]
+                stack[-1].children.append(header)
+
+            headers.append(header)
+            stack.append(header)
+
+        i += 1
+
     return HeaderTree(headers=headers)
 
 
 def parse_document(markdown: str) -> Document:
     """Parse the markdown file and return the parsed document.
 
-    This created a HeaderTree and then with all the elements structured as a tree,
+    This creates a HeaderTree and then with all the elements structured as a tree,
     parses the tree to create a Document object.
-
     """
     header_tree = parse_header_tree(markdown)
+    variables = {}
+
+    def process_header(header: Header, parent_path: str = ""):
+        # Clean the title to get the variable name
+        title = header.title
+
+        # Remove placeholders like {key} or [item]
+        title = re.sub(r"\{[^}]+\}", "", title)
+        title = re.sub(r"\[[^\]]+\]", "", title)
+
+        # Remove parent path prefix if present
+        title = title.split(".")[-1].strip()
+
+        # Build the full path
+        if parent_path:
+            full_path = f"{parent_path}.{title}"
+        else:
+            full_path = title
+
+        # Create variable
+        var = Variable(name=title, doc=header.content)
+
+        # Store with both the full path and just the name
+        if title:  # Only add if title is not empty
+            variables[full_path] = var
+            variables[title] = var
+
+        # Process children
+        for child in header.children:
+            process_header(child, full_path if title else parent_path)
+
+    # Process all top-level headers
+    for header in header_tree.headers:
+        if header.parent is None:
+            process_header(header)
+
+    return Document(variables=variables)

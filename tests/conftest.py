@@ -1,5 +1,3 @@
-import sys
-import pytest
 import pytest_lsp
 from lsprotocol import types
 from pytest_lsp import (
@@ -22,11 +20,11 @@ async def client(lsp_client: LanguageClient):
             capabilities=client_capabilities("visual-studio-code"),
         )
     )
-    
+
     # Store the initialization response for tests to access
     lsp_client.initialization_response = response
-    
+
     yield lsp_client
-    
+
     # Teardown - Shutdown the LSP session
     await lsp_client.shutdown_session()
