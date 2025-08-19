@@ -63,6 +63,7 @@ DATABASES = {"foo": {"NAME": "mydb", ...}}
 > The name for the database
 > if it is sqlite it must be the filename
 > if it is a DBMS it must be a full connection string
+> e.g: `'sqlite:///mydb.sqlite'`
 
 #### {key}.OPTIONS
 > Arbitrary options passed directly to the DBMS driver as a key:value pair.

@@ -9,6 +9,20 @@ doc-lsp is a simple specification and LSP (Language Server) that loads comments 
 
 Document variables in a separate markdown file and this LSP will show the docs on your editor.
 
+Works on:
+
+- Python
+- YAML
+- JSON
+- TOML
+- INI
+- Properties
+- Conf
+- .env files
+- and more...
+
+![doc-lsp](./screenshot.png)
+
 ## Standard
 
 Assuming a file named `settings.py` 
