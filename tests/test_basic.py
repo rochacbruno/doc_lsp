@@ -63,3 +63,30 @@ async def test_hover_on_non_datetime(client: LanguageClient):
     )
 
     assert hover_response is None
+
+
+@pytest.mark.asyncio(loop_scope="module")
+async def test_completion_without_documentation(client: LanguageClient):
+    """Test completion functionality on a file without corresponding .md documentation."""
+
+    test_uri = "file:///test_completion.txt"
+    test_content = "SOME_VARIABLE = 'value'\nOTHER_VAR = 123"
+
+    client.text_document_did_open(
+        types.DidOpenTextDocumentParams(
+            text_document=types.TextDocumentItem(
+                uri=test_uri, language_id="text", version=1, text=test_content
+            )
+        )
+    )
+
+    # Test completion on a variable without documentation file
+    completion_response = await client.text_document_completion_async(
+        types.CompletionParams(
+            text_document=types.TextDocumentIdentifier(uri=test_uri),
+            position=types.Position(line=0, character=4),  # After "SOME"
+        )
+    )
+
+    # Should return empty list when no documentation file exists
+    assert completion_response == []
