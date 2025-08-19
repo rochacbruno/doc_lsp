@@ -23,3 +23,11 @@ build-backend = "hatchling.build"
 
 [tool.uv.sources]
 pygls = { git = "https://github.com/openlawlibrary/pygls" }
+pytest-lsp = { git = "https://github.com/swyddfa/lsp-devtools.git", subdirectory = "lib/pytest-lsp" }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "pytest-lsp>=0.4.3",
+]

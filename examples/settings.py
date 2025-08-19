@@ -1,8 +1,4 @@
-"""Python configuration file,
-each variable is detailed with extensive details on
-settings.py.md
-"""
-
+"""This is a python configuration file,each variable is detailed with extensive details on settings.py.md"""
 SERVER = "localhost"
 PORT = 1234
 DEBUG = True

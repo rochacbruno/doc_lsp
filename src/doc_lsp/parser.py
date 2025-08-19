@@ -152,7 +152,6 @@ Extra content that is ignored by the parser.
 
 """
 
-from typing import Literal
 from pydantic import BaseModel
 
 
@@ -163,10 +162,11 @@ class Variable(BaseModel):
     """
     The variable model, this is the model for a variable.
     """
-    name: str 
+
+    name: str
     doc: str
-    # can optionally take more fields 
-    # full_name: str 
+    # can optionally take more fields
+    # full_name: str
     # type: type (str, dict, list, bool, int, float) taken from default value or header (NAME<type> = 10)
     # default: default value (taken from after the `=` on the header)
     # required: taken from the presence of * on the header (NAME * = 10)
@@ -175,12 +175,13 @@ class Variable(BaseModel):
     parent: "Variable" | None = None
     children: list["Variable"] = []
 
+
 class Document(BaseModel):
     variables: dict[lookup_path, Variable]
 
     def get_variable(self, path: lookup_path) -> Variable | None:
         """Get the variable from the document.
-        
+
         This must be able to perform dynamic lookup from what is received from the LSP,
         so it must be able to handle `SERVER.HOST` and `SERVER__HOST` and `SERVER__HOST__OPTIONS`
         the lookup_path can be a simple str to match or a specific AST path for instant lookup.
@@ -191,21 +192,23 @@ class Header(BaseModel):
     """
     The block model, this is the model for a block.
     """
-    level: int 
-    title: str 
-    content: str 
+
+    level: int
+    title: str
+    content: str
     parent: "Header" | None = None
     children: list["Header"] = []
 
 
 class HeaderTree(BaseModel):
     """Stores all headers parsed from the markdown file
-    
+
     taken from the document start to the document end.
 
     Document start == First `##` or `<!-- doc-start -->`
     Document end == First `<!-- doc-end -->` or `EOF`
     """
+
     headers: list[Header] = []
 
 
@@ -232,10 +235,9 @@ def parse_header_tree(markdown: str) -> HeaderTree:
 
 def parse_document(markdown: str) -> Document:
     """Parse the markdown file and return the parsed document.
-    
+
     This created a HeaderTree and then with all the elements structured as a tree,
     parses the tree to create a Document object.
-    
+
     """
     header_tree = parse_header_tree(markdown)
-    

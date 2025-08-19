@@ -12,7 +12,7 @@ DATE_FORMATS = [
     "%Y-%m-%d",
     "%Y-%m-%dT%H:%M:%S",
 ]
-server = LanguageServer("hover-server", "v1")
+server = LanguageServer("doc-lsp", "v1")
 
 
 @server.feature(types.TEXT_DOCUMENT_HOVER)
@@ -28,14 +28,15 @@ def hover(ls: LanguageServer, params: types.HoverParams):
     # Will have to detect document type and then parse the AST for the document
     # using the parser.py module
 
-
     try:
         line = document.lines[pos.line]
 
-        server.window_log_message(types.LogMessageParams(
-        message=f"Line: {line}",
-        type=types.MessageType.Info,
-        ))
+        server.window_log_message(
+            types.LogMessageParams(
+                message=f"Line: {line}",
+                type=types.MessageType.Info,
+            )
+        )
     except IndexError:
         return None
 
