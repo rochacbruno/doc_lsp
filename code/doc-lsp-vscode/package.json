@@ -1,0 +1,111 @@
+{
+  "name": "doc-lsp",
+  "displayName": "Doc LSP",
+  "description": "Language Server for loading documentation from separate markdown files",
+  "version": "0.1.0",
+  "publisher": "rochacbruno",
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rochacbruno/doc_lsp"
+  },
+  "bugs": {
+    "url": "https://github.com/rochacbruno/doc_lsp/issues"
+  },
+  "homepage": "https://github.com/rochacbruno/doc_lsp#readme",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "documentation",
+    "markdown",
+    "hover",
+    "lsp",
+    "language-server"
+  ],
+  "icon": "icon.png",
+  "activationEvents": [
+    "onLanguage:python",
+    "onLanguage:yaml",
+    "onLanguage:toml",
+    "onLanguage:json",
+    "onLanguage:ini",
+    "onLanguage:properties",
+    "workspaceContains:**/*.py.md",
+    "workspaceContains:**/*.yaml.md",
+    "workspaceContains:**/*.yml.md",
+    "workspaceContains:**/*.toml.md",
+    "workspaceContains:**/*.json.md",
+    "workspaceContains:**/*.ini.md",
+    "workspaceContains:**/*.conf.md",
+    "workspaceContains:**/*.properties.md"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Doc LSP",
+      "properties": {
+        "docLsp.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable Doc LSP"
+        },
+        "docLsp.serverPath": {
+          "type": "string",
+          "default": "doc-lsp",
+          "description": "Path to the doc-lsp executable. Can be 'doc-lsp' if installed globally, or a full path."
+        },
+        "docLsp.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server."
+        },
+        "docLsp.additionalFileExtensions": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional file extensions to enable Doc LSP for (e.g., ['.cfg', '.env'])"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "docLsp.restart",
+        "title": "Doc LSP: Restart Language Server"
+      },
+      {
+        "command": "docLsp.showOutputChannel",
+        "title": "Doc LSP: Show Output Channel"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.74.0",
+    "@vscode/vsce": "^2.24.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  }
+}

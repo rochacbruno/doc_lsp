@@ -1,12 +1,25 @@
 [project]
 name = "doc-lsp"
 version = "0.1.0"
-description = "Add your description here"
+description = "Language Server Protocol implementation for loading documentation from separate markdown files"
 readme = "README.md"
 authors = [
     { name = "Bruno Rocha", email = "rochacbruno@gmail.com" }
 ]
-requires-python = ">=3.13"
+license = { text = "AGPL-3.0-or-later" }
+requires-python = ">=3.11"
+keywords = ["lsp", "language-server", "documentation", "markdown", "hover"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Text Editors :: Integrated Development Environments (IDE)",
+]
 dependencies = [
     "pydantic>=2.11.7",
     "pygls",
@@ -21,6 +34,41 @@ doc-lsp = "doc_lsp:main"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+]
+
+[tool.coverage.run]
+source = ["src/doc_lsp"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/examples/*",
+    "*/feature.py"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
 [tool.uv.sources]
 pygls = { git = "https://github.com/openlawlibrary/pygls" }
 pytest-lsp = { git = "https://github.com/swyddfa/lsp-devtools.git", subdirectory = "lib/pytest-lsp" }
@@ -29,5 +77,6 @@ pytest-lsp = { git = "https://github.com/swyddfa/lsp-devtools.git", subdirectory
 dev = [
     "pytest>=8.4.1",
     "pytest-asyncio>=1.1.0",
+    "pytest-cov>=6.2.1",
     "pytest-lsp>=0.4.3",
 ]
