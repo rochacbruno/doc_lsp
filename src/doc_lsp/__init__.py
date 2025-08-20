@@ -72,6 +72,34 @@ def get_word_at_position(text: str, line: int, character: int) -> Optional[str]:
     return word if word else None
 
 
+def get_prefix_at_position(text: str, line: int, character: int) -> Optional[str]:
+    """Extract the partial word/variable prefix at the given position for completion."""
+    lines = text.split("\n")
+    if line >= len(lines):
+        return None
+
+    line_text = lines[line]
+    if character > len(line_text):
+        return None
+
+    # Find start of current word being typed
+    start = character
+
+    # Move back to find the start of the current word
+    while start > 0 and (
+        line_text[start - 1].isalnum() or line_text[start - 1] in "_."
+    ):
+        start -= 1
+
+    # Get the prefix from start to current position
+    prefix = line_text[start:character].strip()
+
+    # Remove leading/trailing dots
+    prefix = prefix.strip(".")
+
+    return prefix if prefix else None
+
+
 def get_doc_file_path(file_uri: str) -> Optional[Path]:
     """Get the corresponding .md documentation file path."""
     file_path = uri_to_path(file_uri)
@@ -164,6 +192,58 @@ def hover(ls: LanguageServer, params: types.HoverParams):
             end=types.Position(line=pos.line + 1, character=0),
         ),
     )
+
+
+@server.feature(types.TEXT_DOCUMENT_COMPLETION)
+def completion(ls: LanguageServer, params: types.CompletionParams):
+    """Handle completion requests."""
+    pos = params.position
+    document_uri = params.text_document.uri
+    document = ls.workspace.get_text_document(document_uri)
+
+    # Get the prefix being typed at the cursor position
+    prefix = get_prefix_at_position(document.source, pos.line, pos.character)
+
+    if not prefix:
+        return []
+
+    # Get the documentation file path
+    doc_file = get_doc_file_path(document_uri)
+
+    if not doc_file:
+        return []
+
+    # Load the documentation
+    doc = load_documentation(doc_file)
+
+    if not doc:
+        return []
+
+    # Find all variables that start with the prefix
+    completion_items = []
+    prefix_lower = prefix.lower()
+
+    for var_name, variable in doc.variables.items():
+        # Check if variable name starts with the prefix (case insensitive)
+        if var_name.lower().startswith(prefix_lower):
+            # Avoid duplicate entries (variables are stored with both full path and name)
+            if any(item.label == variable.name for item in completion_items):
+                continue
+
+            # Create completion item
+            completion_item = types.CompletionItem(
+                label=variable.name,
+                kind=types.CompletionItemKind.Variable,
+                detail=f"Variable: {variable.name}",
+                documentation=types.MarkupContent(
+                    kind=types.MarkupKind.Markdown,
+                    value=f"## {variable.name}\n\n{variable.doc}" if variable.doc else f"## {variable.name}"
+                ),
+                insert_text=variable.name,
+            )
+            completion_items.append(completion_item)
+
+    return completion_items
 
 
 @server.feature(types.WORKSPACE_DID_CHANGE_WATCHED_FILES)
