@@ -1,5 +1,7 @@
+import argparse
 import logging
 import os
+import sys
 from pathlib import Path
 from typing import Optional
 from urllib.parse import unquote, urlparse
@@ -8,6 +10,13 @@ from lsprotocol import types
 from pygls.lsp.server import LanguageServer
 
 from .parser import parse_document
+
+# Version information
+try:
+    from importlib.metadata import version
+    __version__ = version("doc-lsp")
+except Exception:
+    __version__ = "0.1.0"  # Fallback version
 
 
 def uri_to_path(uri: str) -> Path:
@@ -312,5 +321,31 @@ def did_change_watched_files(
 
 
 def main():
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    """Main entry point for doc-lsp server."""
+    # Set up argument parser
+    parser = argparse.ArgumentParser(
+        prog="doc-lsp",
+        description="Language Server Protocol implementation for loading documentation from separate markdown files"
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"doc-lsp {__version__}",
+        help="show version and exit"
+    )
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        default="INFO",
+        help="set logging level (default: INFO)"
+    )
+    
+    # Parse arguments
+    args = parser.parse_args()
+    
+    # Set up logging
+    log_level = getattr(logging, args.log_level)
+    logging.basicConfig(level=log_level, format="%(message)s")
+    
+    # Start the server
     server.start_io()
