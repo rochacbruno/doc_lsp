@@ -22,7 +22,7 @@ async def test_hover_on_settings(client: LanguageClient):
         os.path.join(os.path.dirname(__file__), "..", "examples", "settings.py")
     )
     # Handle Windows paths correctly
-    if os.name == 'nt':  # Windows
+    if os.name == "nt":  # Windows
         test_uri = "file:///" + test_path.replace("\\", "/")
     else:
         test_uri = "file://" + test_path
@@ -87,7 +87,7 @@ async def test_hover_on_non_variable(client: LanguageClient):
         os.path.join(os.path.dirname(__file__), "..", "examples", "settings.py")
     )
     # Handle Windows paths correctly
-    if os.name == 'nt':  # Windows
+    if os.name == "nt":  # Windows
         test_uri = "file:///" + test_path.replace("\\", "/")
     else:
         test_uri = "file://" + test_path
@@ -132,7 +132,7 @@ async def test_hover_on_yaml_file(client: LanguageClient):
         os.path.join(os.path.dirname(__file__), "..", "examples", "marmite.yaml")
     )
     # Handle Windows paths correctly
-    if os.name == 'nt':  # Windows
+    if os.name == "nt":  # Windows
         test_uri = "file:///" + test_path.replace("\\", "/")
     else:
         test_uri = "file://" + test_path
@@ -178,7 +178,7 @@ async def test_completion_on_settings(client: LanguageClient):
         os.path.join(os.path.dirname(__file__), "..", "examples", "settings.py")
     )
     # Handle Windows paths correctly
-    if os.name == 'nt':  # Windows
+    if os.name == "nt":  # Windows
         test_uri = "file:///" + test_path.replace("\\", "/")
     else:
         test_uri = "file://" + test_path
@@ -202,14 +202,14 @@ async def test_completion_on_settings(client: LanguageClient):
 
     assert completion_response is not None
     assert len(completion_response) > 0
-    
+
     # Find SERVER in the completion items
     server_item = None
     for item in completion_response:
         if item.label == "SERVER":
             server_item = item
             break
-    
+
     assert server_item is not None
     assert server_item.kind == types.CompletionItemKind.Variable
     assert server_item.documentation is not None
@@ -225,7 +225,7 @@ async def test_completion_partial_match(client: LanguageClient):
         os.path.join(os.path.dirname(__file__), "..", "examples", "settings.py")
     )
     # Handle Windows paths correctly
-    if os.name == 'nt':  # Windows
+    if os.name == "nt":  # Windows
         test_uri = "file:///" + test_path.replace("\\", "/")
     else:
         test_uri = "file://" + test_path
@@ -249,7 +249,7 @@ async def test_completion_partial_match(client: LanguageClient):
 
     assert completion_response is not None
     assert len(completion_response) > 0
-    
+
     # Check that variables starting with "D" are suggested
     suggested_labels = [item.label for item in completion_response]
     assert "DEBUG" in suggested_labels
@@ -265,7 +265,7 @@ async def test_completion_no_prefix(client: LanguageClient):
         os.path.join(os.path.dirname(__file__), "..", "examples", "settings.py")
     )
     # Handle Windows paths correctly
-    if os.name == 'nt':  # Windows
+    if os.name == "nt":  # Windows
         test_uri = "file:///" + test_path.replace("\\", "/")
     else:
         test_uri = "file://" + test_path

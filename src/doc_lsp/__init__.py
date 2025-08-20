@@ -1,7 +1,6 @@
 import argparse
 import logging
 import os
-import sys
 from pathlib import Path
 from typing import Optional
 from urllib.parse import unquote, urlparse
@@ -14,6 +13,7 @@ from .parser import parse_document
 # Version information
 try:
     from importlib.metadata import version
+
     __version__ = version("doc-lsp")
 except Exception:
     __version__ = "0.1.0"  # Fallback version
@@ -23,12 +23,18 @@ def uri_to_path(uri: str) -> Path:
     """Convert a file URI to a Path object, handling Windows paths correctly."""
     parsed = urlparse(uri)
     path_str = unquote(parsed.path)
-    
+
     # Handle Windows paths (remove leading slash if it's a Windows drive path)
-    if os.name == 'nt' and path_str.startswith('/') and len(path_str) > 2 and path_str[2] == ':':
+    if (
+        os.name == "nt"
+        and path_str.startswith("/")
+        and len(path_str) > 2
+        and path_str[2] == ":"
+    ):
         path_str = path_str[1:]
-    
+
     return Path(path_str)
+
 
 server = LanguageServer("doc-lsp", "v1")
 
@@ -255,7 +261,7 @@ def completion(ls: LanguageServer, params: types.CompletionParams):
                 data={
                     "variable_name": variable.name,
                     "doc_file": str(doc_file),
-                }
+                },
             )
             completion_items.append(completion_item)
 
@@ -268,39 +274,39 @@ def completion_item_resolve(ls: LanguageServer, params: types.CompletionItem):
     # Get the data from the completion item
     if not params.data:
         return params
-    
+
     variable_name = params.data.get("variable_name")
     doc_file_str = params.data.get("doc_file")
-    
+
     if not variable_name or not doc_file_str:
         return params
-    
+
     doc_file = Path(doc_file_str)
-    
+
     # Load the documentation
     doc = load_documentation(doc_file)
-    
+
     if not doc:
         return params
-    
+
     # Get the variable
     variable = doc.get_variable(variable_name)
-    
+
     if not variable:
         return params
-    
+
     # Add full documentation to the completion item
     if variable.doc:
         params.documentation = types.MarkupContent(
             kind=types.MarkupKind.Markdown,
-            value=f"## {variable.name}\n\n{variable.doc}"
+            value=f"## {variable.name}\n\n{variable.doc}",
         )
     else:
         params.documentation = types.MarkupContent(
             kind=types.MarkupKind.Markdown,
-            value=f"## {variable.name}\n\nNo documentation available."
+            value=f"## {variable.name}\n\nNo documentation available.",
         )
-    
+
     return params
 
 
@@ -325,27 +331,32 @@ def main():
     # Set up argument parser
     parser = argparse.ArgumentParser(
         prog="doc-lsp",
-        description="Language Server Protocol implementation for loading documentation from separate markdown files"
+        description="Language Server Protocol implementation for loading documentation from separate markdown files",
     )
     parser.add_argument(
         "--version",
         action="version",
         version=f"doc-lsp {__version__}",
-        help="show version and exit"
+        help="show version and exit",
     )
     parser.add_argument(
         "--log-level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         default="INFO",
-        help="set logging level (default: INFO)"
+        help="set logging level (default: INFO)",
     )
-    
+    parser.add_argument(
+        "--stdio",
+        action="store_true",
+        help="use stdio for communication (default: False)",
+    )
+
     # Parse arguments
     args = parser.parse_args()
-    
+
     # Set up logging
     log_level = getattr(logging, args.log_level)
     logging.basicConfig(level=log_level, format="%(message)s")
-    
+
     # Start the server
     server.start_io()
