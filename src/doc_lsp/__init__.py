@@ -144,6 +144,12 @@ def load_documentation(doc_file: Path) -> Optional[dict]:
         return None
 
 
+@server.feature(types.INITIALIZE)
+def initialize(ls: LanguageServer, params: types.InitializeParams):
+    """Initialize the server with capabilities."""
+    pass  # The server will automatically handle capabilities
+
+
 @server.feature(types.TEXT_DOCUMENT_HOVER)
 def hover(ls: LanguageServer, params: types.HoverParams):
     """Handle hover requests."""
@@ -230,20 +236,63 @@ def completion(ls: LanguageServer, params: types.CompletionParams):
             if any(item.label == variable.name for item in completion_items):
                 continue
 
-            # Create completion item
+            # Create completion item with data for resolve
             completion_item = types.CompletionItem(
                 label=variable.name,
                 kind=types.CompletionItemKind.Variable,
                 detail=f"Variable: {variable.name}",
-                documentation=types.MarkupContent(
-                    kind=types.MarkupKind.Markdown,
-                    value=f"## {variable.name}\n\n{variable.doc}" if variable.doc else f"## {variable.name}"
-                ),
                 insert_text=variable.name,
+                # Store data needed for resolve
+                data={
+                    "variable_name": variable.name,
+                    "doc_file": str(doc_file),
+                }
             )
             completion_items.append(completion_item)
 
     return completion_items
+
+
+@server.feature(types.COMPLETION_ITEM_RESOLVE)
+def completion_item_resolve(ls: LanguageServer, params: types.CompletionItem):
+    """Resolve completion item to provide full documentation."""
+    # Get the data from the completion item
+    if not params.data:
+        return params
+    
+    variable_name = params.data.get("variable_name")
+    doc_file_str = params.data.get("doc_file")
+    
+    if not variable_name or not doc_file_str:
+        return params
+    
+    doc_file = Path(doc_file_str)
+    
+    # Load the documentation
+    doc = load_documentation(doc_file)
+    
+    if not doc:
+        return params
+    
+    # Get the variable
+    variable = doc.get_variable(variable_name)
+    
+    if not variable:
+        return params
+    
+    # Add full documentation to the completion item
+    if variable.doc:
+        params.documentation = types.MarkupContent(
+            kind=types.MarkupKind.Markdown,
+            value=f"## {variable.name}\n\n{variable.doc}"
+        )
+    else:
+        params.documentation = types.MarkupContent(
+            kind=types.MarkupKind.Markdown,
+            value=f"## {variable.name}\n\nNo documentation available."
+        )
+    
+    return params
 
 
 @server.feature(types.WORKSPACE_DID_CHANGE_WATCHED_FILES)
