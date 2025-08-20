@@ -257,6 +257,10 @@ def completion(ls: LanguageServer, params: types.CompletionParams):
                 kind=types.CompletionItemKind.Variable,
                 detail=f"Variable: {variable.name}",
                 insert_text=variable.name,
+                documentation=types.MarkupContent(
+                    kind=types.MarkupKind.Markdown,
+                    value=f"## {variable.name}\n\n{variable.doc}",
+                ),
                 # Store data needed for resolve
                 data={
                     "variable_name": variable.name,
@@ -266,48 +270,6 @@ def completion(ls: LanguageServer, params: types.CompletionParams):
             completion_items.append(completion_item)
 
     return completion_items
-
-
-@server.feature(types.COMPLETION_ITEM_RESOLVE)
-def completion_item_resolve(ls: LanguageServer, params: types.CompletionItem):
-    """Resolve completion item to provide full documentation."""
-    # Get the data from the completion item
-    if not params.data:
-        return params
-
-    variable_name = params.data.get("variable_name")
-    doc_file_str = params.data.get("doc_file")
-
-    if not variable_name or not doc_file_str:
-        return params
-
-    doc_file = Path(doc_file_str)
-
-    # Load the documentation
-    doc = load_documentation(doc_file)
-
-    if not doc:
-        return params
-
-    # Get the variable
-    variable = doc.get_variable(variable_name)
-
-    if not variable:
-        return params
-
-    # Add full documentation to the completion item
-    if variable.doc:
-        params.documentation = types.MarkupContent(
-            kind=types.MarkupKind.Markdown,
-            value=f"## {variable.name}\n\n{variable.doc}",
-        )
-    else:
-        params.documentation = types.MarkupContent(
-            kind=types.MarkupKind.Markdown,
-            value=f"## {variable.name}\n\nNo documentation available.",
-        )
-
-    return params
 
 
 @server.feature(types.WORKSPACE_DID_CHANGE_WATCHED_FILES)
