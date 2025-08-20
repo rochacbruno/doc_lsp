@@ -5,7 +5,7 @@ from typing import Optional
 from urllib.parse import unquote, urlparse
 
 from lsprotocol import types
-from pygls.lsp.server import LanguageServer
+from pygls.server import LanguageServer
 
 from .parser import parse_document
 

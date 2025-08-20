@@ -243,7 +243,7 @@ async def test_completion_partial_match(client: LanguageClient):
     completion_response = await client.text_document_completion_async(
         types.CompletionParams(
             text_document=types.TextDocumentIdentifier(uri=test_uri),
-            position=types.Position(line=4, character=1),  # After "D" 
+            position=types.Position(line=3, character=1),  # After "D" in "DEBUG"
         )
     )
 
