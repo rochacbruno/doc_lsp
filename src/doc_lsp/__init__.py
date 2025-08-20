@@ -1,3 +1,4 @@
+import argparse
 import logging
 import os
 from pathlib import Path
@@ -9,17 +10,31 @@ from pygls.lsp.server import LanguageServer
 
 from .parser import parse_document
 
+# Version information
+try:
+    from importlib.metadata import version
+
+    __version__ = version("doc-lsp")
+except Exception:
+    __version__ = "0.1.0"  # Fallback version
+
 
 def uri_to_path(uri: str) -> Path:
     """Convert a file URI to a Path object, handling Windows paths correctly."""
     parsed = urlparse(uri)
     path_str = unquote(parsed.path)
-    
+
     # Handle Windows paths (remove leading slash if it's a Windows drive path)
-    if os.name == 'nt' and path_str.startswith('/') and len(path_str) > 2 and path_str[2] == ':':
+    if (
+        os.name == "nt"
+        and path_str.startswith("/")
+        and len(path_str) > 2
+        and path_str[2] == ":"
+    ):
         path_str = path_str[1:]
-    
+
     return Path(path_str)
+
 
 server = LanguageServer("doc-lsp", "v1")
 
@@ -144,6 +159,12 @@ def load_documentation(doc_file: Path) -> Optional[dict]:
         return None
 
 
+@server.feature(types.INITIALIZE)
+def initialize(ls: LanguageServer, params: types.InitializeParams):
+    """Initialize the server with capabilities."""
+    pass  # The server will automatically handle capabilities
+
+
 @server.feature(types.TEXT_DOCUMENT_HOVER)
 def hover(ls: LanguageServer, params: types.HoverParams):
     """Handle hover requests."""
@@ -230,16 +251,21 @@ def completion(ls: LanguageServer, params: types.CompletionParams):
             if any(item.label == variable.name for item in completion_items):
                 continue
 
-            # Create completion item
+            # Create completion item with data for resolve
             completion_item = types.CompletionItem(
                 label=variable.name,
                 kind=types.CompletionItemKind.Variable,
                 detail=f"Variable: {variable.name}",
+                insert_text=variable.name,
                 documentation=types.MarkupContent(
                     kind=types.MarkupKind.Markdown,
-                    value=f"## {variable.name}\n\n{variable.doc}" if variable.doc else f"## {variable.name}"
+                    value=f"## {variable.name}\n\n{variable.doc}",
                 ),
-                insert_text=variable.name,
+                # Store data needed for resolve
+                data={
+                    "variable_name": variable.name,
+                    "doc_file": str(doc_file),
+                },
             )
             completion_items.append(completion_item)
 
@@ -263,5 +289,36 @@ def did_change_watched_files(
 
 
 def main():
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    """Main entry point for doc-lsp server."""
+    # Set up argument parser
+    parser = argparse.ArgumentParser(
+        prog="doc-lsp",
+        description="Language Server Protocol implementation for loading documentation from separate markdown files",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"doc-lsp {__version__}",
+        help="show version and exit",
+    )
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        default="INFO",
+        help="set logging level (default: INFO)",
+    )
+    parser.add_argument(
+        "--stdio",
+        action="store_true",
+        help="use stdio for communication (default: False)",
+    )
+
+    # Parse arguments
+    args = parser.parse_args()
+
+    # Set up logging
+    log_level = getattr(logging, args.log_level)
+    logging.basicConfig(level=log_level, format="%(message)s")
+
+    # Start the server
     server.start_io()

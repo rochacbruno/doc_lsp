@@ -141,11 +141,15 @@ You can also use the [Generic LSP Proxy](https://marketplace.visualstudio.com/it
 
 #### Other Editors
 
-doc-lsp implements the Language Server Protocol and can be used with any LSP-compatible editor:
+doc-lsp implements the Language Server Protocol and can be used with any LSP-compatible editor.
 
-- **Neovim**: Use [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)
-- **Emacs**: Use [lsp-mode](https://emacs-lsp.github.io/lsp-mode/)
-- **Sublime Text**: Use [LSP](https://github.com/sublimelsp/LSP)
+See the comprehensive [Editor Setup Guide](EDITORS_SETUP.md) for detailed instructions on configuring:
+- **Helix** - Modern modal editor with built-in LSP support
+- **Neovim** - Using nvim-lspconfig
+- **Zed** - High-performance collaborative editor  
+- **Emacs** - Using lsp-mode or eglot
+- **Sublime Text** - Using LSP package
+- **Kate** - See dedicated [Kate Setup Guide](KATE_SETUP.md)
 
 ## Implementation
 
