@@ -51,7 +51,7 @@ jobs:
 
     - name: Upload coverage HTML report
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.13'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: coverage-report
         path: htmlcov/
